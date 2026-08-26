@@ -88,8 +88,10 @@ def main():
 
     # 6. Test suite
     print("\n[6] Test suite:")
+    # sys.executable -m pytest thay vì "pytest": lab chạy trong venv riêng
+    # (D:/v24) không nằm trên PATH, gọi "pytest" trần sẽ không tìm thấy.
     result = subprocess.run(
-        ["pytest", "tests/", "--tb=short", "-q"],
+        [sys.executable, "-m", "pytest", "tests/", "--tb=short", "-q"],
         capture_output=True, text=True,
     )
     tests_ok = result.returncode == 0

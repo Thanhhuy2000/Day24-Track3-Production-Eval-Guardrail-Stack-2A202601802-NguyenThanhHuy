@@ -23,3 +23,9 @@ nemoguardrails>=0.9              # NeMo Guardrails (topic + content rails via LL
 
 # After pip install, run:
 #   python -m spacy download en_core_web_lg
+
+# ── Day 24 adaptation: Gemini provider (Day 18 llm.py) ───────────────────────
+langchain-google-genai>=1.0,<2.0   # RAGAS judge + NeMo main model qua Gemini
+google-generativeai>=0.7           # src/llm.py chat()
+scikit-learn>=1.4                  # cohen_kappa_score (Task 7)
+pytest>=8.0

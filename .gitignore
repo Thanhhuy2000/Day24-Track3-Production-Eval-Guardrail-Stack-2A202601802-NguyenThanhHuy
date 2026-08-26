@@ -5,6 +5,14 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
-answers_50q.json
-reports/*.json
-!reports/.gitkeep
+
+# Lưu ý: answers_50q.json và reports/*.json là deliverable → KHÔNG ignore.
+.setup_checkpoint.json
+
+# Log chay lai duoc, khong phai deliverable
+run_*.log
+
+# Artifact dan xuat: cache enrichment (M5) va checkpoint cham diem RAGAS.
+# Deliverable la reports/ragas_50q.json, checkpoint chi de resume khi bi ngat.
+.enrich_cache.json
+reports/.ragas_checkpoint.json

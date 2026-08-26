@@ -5,9 +5,19 @@ Chạy TRƯỚC khi bắt đầu Phase A:
     python setup_answers.py
 
 Yêu cầu:
-    1. Đã copy src/ từ Day 18 (m1-m5, pipeline.py) vào thư mục này
+    1. Đã copy src/ từ Day 18 (m1-m5, pipeline.py, llm.py) vào thư mục này
     2. docker compose up -d  (Qdrant đang chạy trên port 6333)
-    3. .env có OPENAI_API_KEY
+    3. .env có GEMINI_API_KEY hoặc OPENAI_API_KEY
+
+Ghi chú (khác bản scaffold gốc):
+    - Sinh câu trả lời qua src/llm.py :: answer_from_context() thay vì gọi thẳng
+      OpenAI, để chạy được với provider nào cũng được (Gemini/OpenAI) — cùng một
+      generator với Day 18 pipeline.
+    - Chạy theo 3 PHA (retrieve → unload → rerank → unload → generate) như
+      src/pipeline.py :: evaluate_pipeline(), vì giữ bge-m3 và cross-encoder trong
+      RAM cùng lúc gây access violation trên máy ít RAM.
+    - Checkpoint sau mỗi pha vào .setup_checkpoint.json: retrieval + rerank tốn
+      ~15 phút, không nên chạy lại từ đầu khi LLM dính rate limit.
 """
 from __future__ import annotations
 
@@ -17,6 +27,8 @@ import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+CHECKPOINT_PATH = ".setup_checkpoint.json"
 
 
 def check_day18_files() -> bool:
@@ -35,70 +47,21 @@ def check_day18_files() -> bool:
 
 
 def build_pipeline():
-    from src.m1_chunking import load_documents, chunk_hierarchical
-    from src.m2_search import HybridSearch
-    from src.m3_rerank import CrossEncoderReranker
-    from src.m5_enrichment import enrich_chunks
-    from config import RERANK_TOP_K
-
-    print("\n[1/3] Chunking + enriching documents...")
-    t0 = time.time()
-    docs = load_documents()
-    all_chunks = []
-    for doc in docs:
-        parents, children = chunk_hierarchical(doc["text"], metadata=doc["metadata"])
-        for child in children:
-            all_chunks.append({
-                "text": child.text,
-                "metadata": {**child.metadata, "parent_id": child.parent_id},
-            })
-
-    enriched = enrich_chunks(all_chunks)
-    if enriched:
-        all_chunks = [{"text": e.enriched_text, "metadata": e.auto_metadata} for e in enriched]
-        print(f"  ✓ Enriched {len(enriched)} chunks ({time.time()-t0:.1f}s)")
-    else:
-        print(f"  ✓ Using {len(all_chunks)} raw chunks (M5 not implemented or no API key)")
-
-    print("\n[2/3] Indexing (BM25 + Dense)...")
-    t0 = time.time()
-    search = HybridSearch()
-    search.index(all_chunks)
-    print(f"  ✓ Indexed {len(all_chunks)} chunks ({time.time()-t0:.1f}s)")
-
-    print("\n[3/3] Loading reranker...")
-    t0 = time.time()
-    reranker = CrossEncoderReranker()
-    print(f"  ✓ Reranker ready ({time.time()-t0:.1f}s)")
-
-    return search, reranker, RERANK_TOP_K
+    """Chunk → enrich → index → chuẩn bị reranker (dùng lại build_pipeline của Day 18)."""
+    from src.pipeline import build_pipeline as day18_build
+    return day18_build()
 
 
-def run_query(q: str, search, reranker, top_k: int) -> tuple[str, list[str]]:
-    from config import OPENAI_API_KEY
+def load_checkpoint() -> dict:
+    if os.path.exists(CHECKPOINT_PATH):
+        with open(CHECKPOINT_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    return {}
 
-    results = search.search(q)
-    docs    = [{"text": r.text, "score": r.score, "metadata": r.metadata} for r in results]
-    reranked = reranker.rerank(q, docs, top_k=top_k)
-    contexts = [r.text for r in reranked] if reranked else [r.text for r in results[:3]]
 
-    if OPENAI_API_KEY and contexts:
-        try:
-            from openai import OpenAI
-            client = OpenAI()
-            ctx = "\n\n".join(contexts)
-            resp = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": "Trả lời CHỈ dựa trên context. Nếu không có → nói 'Không tìm thấy.'"},
-                    {"role": "user",   "content": f"Context:\n{ctx}\n\nCâu hỏi: {q}"},
-                ],
-            )
-            return resp.choices[0].message.content, contexts
-        except Exception as e:
-            print(f"  ⚠️  LLM generation failed: {e}")
-
-    return (contexts[0] if contexts else "Không tìm thấy thông tin."), contexts
+def save_checkpoint(data: dict) -> None:
+    with open(CHECKPOINT_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False)
 
 
 def main():
@@ -109,23 +72,66 @@ def main():
     if not check_day18_files():
         sys.exit(1)
 
+    from config import HYBRID_TOP_K, RERANK_TOP_K
+    from src.llm import answer_from_context, provider
+
     with open("test_set_50q.json", encoding="utf-8") as f:
         test_set = json.load(f)
-    print(f"✓ Loaded {len(test_set)} questions (factual/multi_hop/adversarial)")
+    n = len(test_set)
+    print(f"✓ Loaded {n} questions (factual/multi_hop/adversarial)")
+    print(f"✓ LLM provider: {provider()}")
 
-    try:
-        search, reranker, top_k = build_pipeline()
-    except ImportError as e:
-        print(f"\n❌ Import error: {e}")
-        print("→ Đảm bảo bạn đã copy src/ từ Day 18 và đã pip install -r requirements.txt")
-        sys.exit(1)
+    questions = [item["question"] for item in test_set]
+    checkpoint = load_checkpoint()
 
-    print(f"\nRunning {len(test_set)} queries...")
+    # ── Pha A+B: retrieval + rerank (cần model local, tốn RAM) ────────────────
+    if len(checkpoint.get("contexts", [])) == n:
+        all_contexts = checkpoint["contexts"]
+        print(f"\n✓ Dùng lại contexts từ {CHECKPOINT_PATH} (bỏ qua retrieval + rerank)")
+    else:
+        try:
+            search, reranker = build_pipeline()
+        except ImportError as e:
+            print(f"\n❌ Import error: {e}")
+            print("→ Đã copy src/ từ Day 18 và pip install -r requirements.txt chưa?")
+            sys.exit(1)
+
+        print(f"\n[Pha A] Hybrid retrieval cho {n} câu hỏi...", flush=True)
+        t0 = time.time()
+        retrieved = []
+        for i, q in enumerate(questions):
+            results = search.search(q, top_k=HYBRID_TOP_K)
+            retrieved.append([{"text": r.text, "score": r.score, "metadata": r.metadata}
+                              for r in results])
+            if (i + 1) % 10 == 0:
+                print(f"  [{i+1}/{n}] retrieved ({time.time()-t0:.0f}s)", flush=True)
+
+        search.dense.unload()   # nhường RAM cho cross-encoder
+        print("  ✓ Đã unload embedding model", flush=True)
+
+        print(f"\n[Pha B] Reranking top-{HYBRID_TOP_K} → top-{RERANK_TOP_K}...", flush=True)
+        t0 = time.time()
+        all_contexts = []
+        for i, (q, docs) in enumerate(zip(questions, retrieved)):
+            reranked = reranker.rerank(q, docs, top_k=RERANK_TOP_K)
+            contexts = ([r.text for r in reranked] if reranked
+                        else [d["text"] for d in docs[:RERANK_TOP_K]])
+            all_contexts.append(contexts or ["Không có context."])
+            if (i + 1) % 10 == 0:
+                print(f"  [{i+1}/{n}] reranked ({time.time()-t0:.0f}s)", flush=True)
+
+        reranker.unload()
+        print("  ✓ Đã unload reranker", flush=True)
+
+        checkpoint["contexts"] = all_contexts
+        save_checkpoint(checkpoint)
+
+    # ── Pha C: generation (chỉ gọi API) ───────────────────────────────────────
+    print(f"\n[Pha C] Sinh câu trả lời bằng {provider()}...", flush=True)
+    t0 = time.time()
     answers = []
-    t_start = time.time()
-
-    for i, item in enumerate(test_set):
-        answer, contexts = run_query(item["question"], search, reranker, top_k)
+    for i, (item, contexts) in enumerate(zip(test_set, all_contexts)):
+        answer = answer_from_context(item["question"], contexts)
         answers.append({
             "id":           item["id"],
             "distribution": item["distribution"],
@@ -135,13 +141,13 @@ def main():
             "ground_truth": item["ground_truth"],
         })
         if (i + 1) % 10 == 0:
-            print(f"  [{i+1}/{len(test_set)}] done ({time.time()-t_start:.0f}s elapsed)")
+            print(f"  [{i+1}/{n}] answered ({time.time()-t0:.0f}s)", flush=True)
 
     with open("answers_50q.json", "w", encoding="utf-8") as f:
         json.dump(answers, f, ensure_ascii=False, indent=2)
 
     print(f"\n✓ Saved {len(answers)} answers → answers_50q.json")
-    print(f"  Total time: {time.time()-t_start:.1f}s")
+    print(f"  Total generation time: {time.time()-t0:.1f}s")
     print("\n→ Bây giờ bắt đầu Phase A:")
     print("     python src/phase_a_ragas.py")
 

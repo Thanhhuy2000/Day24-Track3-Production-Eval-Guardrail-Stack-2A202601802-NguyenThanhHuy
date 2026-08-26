@@ -1,0 +1,236 @@
+{
+  "judge_model": "gemma-4-31b-it",
+  "provider": "gemini",
+  "n_judged": 10,
+  "cohen_kappa": -0.1538,
+  "kappa_interpretation": "poor (tệ hơn ngẫu nhiên)",
+  "agreement_rate": 0.4,
+  "judge_labels": [
+    0,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0
+  ],
+  "human_labels": [
+    1,
+    0,
+    1,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0
+  ],
+  "bias_report": {
+    "total_judged": 10,
+    "position_bias_rate": 0.2,
+    "position_bias_count": 2,
+    "verbosity_bias": 0.857,
+    "verbosity_details": {
+      "a_wins_a_longer": 0,
+      "b_wins_b_longer": 6,
+      "total_decisive": 7
+    },
+    "interpretation": "Position bias 20% — thấp, judge ổn định theo thứ tự trình bày. Verbosity bias 86% trên 7 case decisive — judge thiên vị câu trả lời dài hơn, nên siết ràng buộc 'dài không đồng nghĩa tốt' trong prompt."
+  },
+  "details": [
+    {
+      "question": "Nhân viên được nghỉ bao nhiêu ngày khi kết hôn?",
+      "answer_a": "Nhân viên được nghỉ 3 ngày làm việc có lương khi kết hôn.",
+      "answer_b": "Nhân viên được nghỉ 3 ngày làm việc có lương khi kết hôn, không trừ vào phép năm.",
+      "winner_pass1": "B",
+      "winner_pass2": "B",
+      "final_winner": "B",
+      "reasoning_pass1": "Cả hai câu trả lời đều chính xác về số ngày nghỉ. Tuy nhiên, câu B đầy đủ hơn khi làm rõ thông tin ngày nghỉ này không bị trừ vào phép năm, đây là chi tiết quan trọng trong chính sách nhân sự.",
+      "reasoning_pass2": "Câu A đầy đủ hơn câu B vì cung cấp thêm thông tin quan trọng là ngày nghỉ kết hôn không bị trừ vào phép năm, đây là chi tiết thiết yếu trong chính sách nhân sự.",
+      "position_consistent": true,
+      "scores_pass1": {
+        "A": 0.8,
+        "B": 1.0
+      },
+      "scores_pass2": {
+        "A": 0.8,
+        "B": 1.0
+      }
+    },
+    {
+      "question": "Muốn mua thiết bị trị giá 55 triệu cần ai phê duyệt?",
+      "answer_a": "Cần Giám đốc phòng ban phê duyệt.",
+      "answer_b": "Đơn hàng trên 50.000.000 VNĐ cần Tổng Giám đốc (CEO) phê duyệt.",
+      "winner_pass1": "B",
+      "winner_pass2": "tie",
+      "final_winner": "tie",
+      "reasoning_pass1": "Câu trả lời B cung cấp căn cứ cụ thể (ngưỡng trên 50 triệu VNĐ) để xác định người phê duyệt cho số tiền 55 triệu, trong khi câu A trả lời quá chung chung và thiếu cơ sở.",
+      "reasoning_pass2": "",
+      "position_consistent": false,
+      "scores_pass1": {
+        "A": 0.5,
+        "B": 1.0
+      },
+      "scores_pass2": {
+        "A": 0.0,
+        "B": 0.0
+      }
+    },
+    {
+      "question": "Thưởng Tết tối thiểu cho nhân viên chính thức có từ 6 tháng trở lên là bao nhiêu?",
+      "answer_a": "Nhân viên được thưởng Tết tối thiểu 1 tháng lương.",
+      "answer_b": "Nhân viên chính thức có thời gian làm việc từ 6 tháng trở lên được thưởng Tết tối thiểu 1 tháng lương. Nhân viên dưới 6 tháng được hưởng pro-rata theo số tháng làm việc thực tế.",
+      "winner_pass1": "A",
+      "winner_pass2": "B",
+      "final_winner": "tie",
+      "reasoning_pass1": "Câu trả lời A trả lời trực tiếp, chính xác và súc tích đúng trọng tâm câu hỏi. Câu trả lời B cung cấp thêm thông tin về nhân viên dưới 6 tháng, đây là thông tin không được yêu cầu, vi phạm tiêu chí tính súc tích.",
+      "reasoning_pass2": "Câu A trả lời chính xác và xác nhận lại điều kiện (6 tháng trở lên) mà người dùng hỏi, đảm bảo tính chặt chẽ của chính sách. Câu B quá chung chung, bỏ qua điều kiện ràng buộc, có thể gây hiểu lầm rằng mọi nhân viên đều được thưởng 1 tháng lương.",
+      "position_consistent": false,
+      "scores_pass1": {
+        "A": 1.0,
+        "B": 0.8
+      },
+      "scores_pass2": {
+        "A": 0.7,
+        "B": 0.9
+      }
+    },
+    {
+      "question": "Một nhân viên Senior có 9 năm thâm niên được nghỉ bao nhiêu ngày phép năm và lương trong khoảng nào?",
+      "answer_a": "Được nghỉ 18 ngày phép (15 cơ bản + 3 thâm niên). Lương Senior từ 20 đến 35 triệu.",
+      "answer_b": "Theo chính sách v2024: 15 ngày cơ bản + 3 ngày thâm niên (9÷3=3) = 18 ngày phép. Lương Senior (P3-P4): 20-35 triệu VNĐ/tháng.",
+      "winner_pass1": "B",
+      "winner_pass2": "B",
+      "final_winner": "B",
+      "reasoning_pass1": "Cả hai câu trả lời đều chính xác và đầy đủ. Tuy nhiên, câu B vượt trội hơn vì cung cấp căn cứ cụ thể (phiên bản chính sách v2024), công thức tính ngày phép và phân cấp lương (P3-P4), giúp tăng tính minh bạch và khả năng đối chiếu cho người dùng mà không bị rườm rà.",
+      "reasoning_pass2": "Cả hai câu trả lời đều chính xác và đầy đủ về nội dung. Tuy nhiên, câu A vượt trội hơn vì cung cấp căn cứ cụ thể (phiên bản chính sách v2024, cấp bậc P3-P4) và cách tính chi tiết, giúp tăng tính minh bạch và khả năng đối chiếu trong tra cứu chính sách nhân sự.",
+      "position_consistent": true,
+      "scores_pass1": {
+        "A": 0.8,
+        "B": 0.95
+      },
+      "scores_pass2": {
+        "A": 0.9,
+        "B": 1.0
+      }
+    },
+    {
+      "question": "Nhân viên được tài trợ khóa học 25 triệu, nghỉ việc sau 8 tháng. Phải hoàn trả bao nhiêu?",
+      "answer_a": "Hoàn trả 25 triệu vì chưa đủ 1 năm cam kết.",
+      "answer_b": "Nhân viên phải cam kết làm việc ít nhất 1 năm sau khi hoàn thành khóa học. Nghỉ sau 8 tháng là trước hạn cam kết, phải hoàn trả 100% chi phí tức 25.000.000 VNĐ.",
+      "winner_pass1": "B",
+      "winner_pass2": "B",
+      "final_winner": "B",
+      "reasoning_pass1": "Cả hai câu trả lời đều chính xác về kết quả. Tuy nhiên, câu B tốt hơn vì cung cấp đầy đủ căn cứ chính sách (cam kết 1 năm, hoàn trả 100%) giúp người dùng hiểu rõ lý do tại sao phải hoàn trả số tiền đó, trong khi câu A quá ngắn gọn.",
+      "reasoning_pass2": "Câu trả lời A cung cấp đầy đủ căn cứ chính sách (cam kết làm việc 1 năm) để giải thích cho con số hoàn trả, giúp người dùng hiểu rõ lý do. Câu B quá ngắn gọn, thiếu phần giải thích điều kiện chính sách.",
+      "position_consistent": true,
+      "scores_pass1": {
+        "A": 0.8,
+        "B": 1.0
+      },
+      "scores_pass2": {
+        "A": 0.8,
+        "B": 1.0
+      }
+    },
+    {
+      "question": "Nhân viên tạm ứng 8 triệu, chưa thanh toán sau 30 ngày. Ai phê duyệt và phí phạt là bao nhiêu?",
+      "answer_a": "Trưởng phòng phê duyệt. Phạt 2% tháng trên 8 triệu.",
+      "answer_b": "Phê duyệt: 8 triệu (≥5 triệu) cần Trưởng phòng + Kế toán trưởng. Phí phạt quá hạn 15 ngày: 2%/tháng × 8.000.000 × (15/30) = 80.000 VNĐ. Không được tạm ứng mới cho đến khi hoàn ứng.",
+      "winner_pass1": "B",
+      "winner_pass2": "B",
+      "final_winner": "B",
+      "reasoning_pass1": "Câu B chính xác và chi tiết hơn về điều kiện phê duyệt (phân cấp theo số tiền >= 5 triệu cần thêm Kế toán trưởng) và cung cấp cách tính phí phạt cụ thể thay vì chỉ nêu tỷ lệ.",
+      "reasoning_pass2": "Câu trả lời A chi tiết và chính xác hơn về quy trình phê duyệt dựa trên hạn mức (8 triệu >= 5 triệu) và cung cấp cách tính phí phạt cụ thể, trong khi câu B quá sơ sài và thiếu thông tin về Kế toán trưởng.",
+      "position_consistent": true,
+      "scores_pass1": {
+        "A": 0.6,
+        "B": 0.9
+      },
+      "scores_pass2": {
+        "A": 0.6,
+        "B": 0.9
+      }
+    },
+    {
+      "question": "Nhân viên Manager có thâm niên 12 năm: tổng phụ cấp hàng tháng và số ngày phép năm?",
+      "answer_a": "Phép: 19 ngày. Phụ cấp: 1.500.000 VNĐ/tháng.",
+      "answer_b": "Phụ cấp tháng: ăn trưa 1.000.000 + điện thoại Manager 500.000 = 1.500.000 VNĐ. Phép năm v2024: 15 ngày cơ bản + 4 ngày thâm niên (12÷3=4) = 19 ngày phép.",
+      "winner_pass1": "B",
+      "winner_pass2": "B",
+      "final_winner": "B",
+      "reasoning_pass1": "Cả hai câu trả lời đều chính xác và đầy đủ về mặt kết quả. Tuy nhiên, câu B tốt hơn vì cung cấp chi tiết cách tính (phân rã phụ cấp và cách tính ngày phép thâm niên) cùng phiên bản chính sách (v2024). Điều này giúp người dùng dễ dàng đối chiếu và xác minh tính đúng đắn của con số, trong khi thông tin bổ sung này là hoàn toàn liên quan, không phải là thông tin thừa rườm rà.",
+      "reasoning_pass2": "Cả hai câu trả lời đều chính xác và đầy đủ về mặt kết quả. Tuy nhiên, câu A cung cấp chi tiết cách tính (chi tiết các loại phụ cấp và công thức tính ngày phép thâm niên), giúp người dùng dễ dàng đối chiếu và kiểm chứng với chính sách, trong khi câu B quá ngắn gọn, thiếu căn cứ tính toán.",
+      "position_consistent": true,
+      "scores_pass1": {
+        "A": 0.9,
+        "B": 1.0
+      },
+      "scores_pass2": {
+        "A": 0.9,
+        "B": 1.0
+      }
+    },
+    {
+      "question": "Nhân viên được nghỉ bao nhiêu ngày phép năm?",
+      "answer_a": "Nhân viên được nghỉ 12 ngày phép năm.",
+      "answer_b": "Theo chính sách v2024 HIỆN HÀNH: 15 ngày cơ bản (+1 ngày/3 năm thâm niên). Chính sách v2023 (đã bị thay thế) là 12 ngày. RAG có thể retrieve cả 2 tài liệu — câu trả lời đúng phải ưu tiên v2024.",
+      "winner_pass1": "tie",
+      "winner_pass2": "tie",
+      "final_winner": "tie",
+      "reasoning_pass1": "",
+      "reasoning_pass2": "",
+      "position_consistent": true,
+      "scores_pass1": {
+        "A": 0.0,
+        "B": 0.0
+      },
+      "scores_pass2": {
+        "A": 0.0,
+        "B": 0.0
+      }
+    },
+    {
+      "question": "Nhân viên thử việc có được nghỉ phép năm không?",
+      "answer_a": "Nhân viên thử việc không được nghỉ phép năm và phải xin nghỉ không lương nếu cần.",
+      "answer_b": "KHÔNG. Nhân viên thử việc không được nghỉ phép năm. Nếu cần nghỉ phải xin nghỉ không lương và được trưởng phòng phê duyệt. Đây là negation trap — câu trả lời đúng là phủ định.",
+      "winner_pass1": "A",
+      "winner_pass2": "A",
+      "final_winner": "A",
+      "reasoning_pass1": "Câu trả lời A chính xác, đầy đủ và súc tích. Câu trả lời B chứa thông tin thừa không liên quan đến nội dung chính sách (phần giải thích về 'negation trap'), làm giảm tính chuyên nghiệp và súc tích.",
+      "reasoning_pass2": "Câu trả lời B chính xác và súc tích. Câu trả lời A chứa thông tin thừa không liên quan đến nội dung chính sách (phần giải thích về 'negation trap'), làm giảm tính chuyên nghiệp và súc tích.",
+      "position_consistent": true,
+      "scores_pass1": {
+        "A": 1.0,
+        "B": 0.6
+      },
+      "scores_pass2": {
+        "A": 1.0,
+        "B": 0.7
+      }
+    },
+    {
+      "question": "Nhân viên Manager có thể dùng VPN cá nhân (NordVPN) khi WFH không?",
+      "answer_a": "Được, miễn là đảm bảo kết nối an toàn.",
+      "answer_b": "KHÔNG. Chính sách VPN v1.3 cấm sử dụng VPN cá nhân (NordVPN, ExpressVPN) trong mạng công ty. Bắt buộc dùng VPN WireGuard của công ty. Đây là policy contradiction trap — câu hỏi nghe hợp lý nhưng vi phạm chính sách.",
+      "winner_pass1": "B",
+      "winner_pass2": "B",
+      "final_winner": "B",
+      "reasoning_pass1": "Câu trả lời B chính xác và chi tiết hơn khi dẫn chiếu cụ thể phiên bản chính sách (v1.3) và chỉ rõ công cụ bắt buộc (WireGuard), trong khi câu A trả lời chung chung và có khả năng sai về mặt bảo mật doanh nghiệp.",
+      "reasoning_pass2": "Câu trả lời A chính xác, dẫn chiếu cụ thể phiên bản chính sách (v1.3) và đưa ra giải pháp thay thế đúng quy định. Câu trả lời B trả lời sai nội dung chính sách.",
+      "position_consistent": true,
+      "scores_pass1": {
+        "A": 0.3,
+        "B": 1.0
+      },
+      "scores_pass2": {
+        "A": 0.2,
+        "B": 1.0
+      }
+    }
+  ]
+}

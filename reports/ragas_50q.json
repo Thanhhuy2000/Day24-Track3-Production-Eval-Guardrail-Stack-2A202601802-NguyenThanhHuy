@@ -1,0 +1,150 @@
+{
+  "total_questions": 50,
+  "per_distribution": {
+    "factual": {
+      "count": 20,
+      "faithfulness": 0.9333333333333332,
+      "answer_relevancy": 0.7952199830332057,
+      "context_precision": 0.966666666615,
+      "context_recall": 0.9083333333333332,
+      "avg_score": 0.9008883290787182
+    },
+    "multi_hop": {
+      "count": 20,
+      "faithfulness": 0.5208333333333334,
+      "answer_relevancy": 0.5828597282708716,
+      "context_precision": 0.9666666666295836,
+      "context_recall": 0.7916666666666665,
+      "avg_score": 0.7155065987251137
+    },
+    "adversarial": {
+      "count": 10,
+      "faithfulness": 0.8550000000000001,
+      "answer_relevancy": 0.7083507035267546,
+      "context_precision": 0.9499999999550001,
+      "context_recall": 0.7166666666666668,
+      "avg_score": 0.8075043425371053
+    }
+  },
+  "failure_clusters": {
+    "matrix": {
+      "faithfulness": {
+        "factual": 2,
+        "multi_hop": 13,
+        "adversarial": 1
+      },
+      "context_recall": {
+        "factual": 3,
+        "multi_hop": 4,
+        "adversarial": 7
+      },
+      "context_precision": {
+        "factual": 1,
+        "multi_hop": 0,
+        "adversarial": 0
+      },
+      "answer_relevancy": {
+        "factual": 14,
+        "multi_hop": 3,
+        "adversarial": 2
+      }
+    },
+    "dominant_failure_distribution": "multi_hop",
+    "dominant_failure_metric": "answer_relevancy",
+    "per_distribution_avg": {
+      "factual": 0.9009,
+      "multi_hop": 0.7155,
+      "adversarial": 0.8075
+    },
+    "per_metric_avg": {
+      "faithfulness": 0.7527,
+      "context_recall": 0.8233,
+      "context_precision": 0.9633,
+      "answer_relevancy": 0.6929
+    },
+    "weakest_metric_by_avg": "answer_relevancy",
+    "insight": "Distribution 'multi_hop' yếu nhất (avg_score=0.716). Metric 'answer_relevancy' là worst_metric của 19/50 câu hỏi; metric có điểm trung bình thấp nhất là 'answer_relevancy' (0.693). Gợi ý khắc phục: Improve prompt template."
+  },
+  "bottom_10": [
+    {
+      "rank": 1,
+      "question_id": 39,
+      "distribution": "multi_hop",
+      "question": "So sánh yêu cầu mật khẩu giữa policy v1.0 và v2.0 về độ dài tối thiểu, thời hạn đổi và MFA.",
+      "avg_score": 0.125,
+      "worst_metric": "faithfulness"
+    },
+    {
+      "rank": 2,
+      "question_id": 44,
+      "distribution": "adversarial",
+      "question": "Bao lâu phải đổi mật khẩu một lần?",
+      "avg_score": 0.375,
+      "worst_metric": "faithfulness"
+    },
+    {
+      "rank": 3,
+      "question_id": 33,
+      "distribution": "multi_hop",
+      "question": "Nhân viên Manager có thâm niên 12 năm: tổng phụ cấp hàng tháng và số ngày phép năm theo v2024 là bao nhiêu?",
+      "avg_score": 0.375,
+      "worst_metric": "faithfulness"
+    },
+    {
+      "rank": 4,
+      "question_id": 35,
+      "distribution": "multi_hop",
+      "question": "Nhân viên Junior P1 có lương cơ bản 12 triệu vừa vào thử việc: nhận lương bao nhiêu và phụ cấp gì tháng đầu tiên?",
+      "avg_score": 0.375,
+      "worst_metric": "faithfulness"
+    },
+    {
+      "rank": 5,
+      "question_id": 31,
+      "distribution": "multi_hop",
+      "question": "Nhân viên đi công tác trong nước 2 ngày, ở khách sạn giá 1.500.000 VNĐ/đêm. Công ty thanh toán tối đa bao nhiêu cho tiền khách sạn?",
+      "avg_score": 0.4167,
+      "worst_metric": "faithfulness"
+    },
+    {
+      "rank": 6,
+      "question_id": 25,
+      "distribution": "multi_hop",
+      "question": "Lương thử việc của nhân viên Junior mức cao nhất là bao nhiêu?",
+      "avg_score": 0.5,
+      "worst_metric": "faithfulness"
+    },
+    {
+      "rank": 7,
+      "question_id": 37,
+      "distribution": "multi_hop",
+      "question": "Nhân viên tự ý xóa malware khỏi máy và chia sẻ thông tin sự cố này trên Slack nội bộ. Vi phạm những chính sách nào cụ thể?",
+      "avg_score": 0.5,
+      "worst_metric": "faithfulness"
+    },
+    {
+      "rank": 8,
+      "question_id": 50,
+      "distribution": "adversarial",
+      "question": "Nhân viên Manager có thể dùng VPN cá nhân (như NordVPN) khi WFH để tăng bảo mật thêm không?",
+      "avg_score": 0.6667,
+      "worst_metric": "answer_relevancy"
+    },
+    {
+      "rank": 9,
+      "question_id": 9,
+      "distribution": "factual",
+      "question": "Nam nhân viên được nghỉ bao nhiêu ngày khi vợ sinh con?",
+      "avg_score": 0.667,
+      "worst_metric": "faithfulness"
+    },
+    {
+      "rank": 10,
+      "question_id": 38,
+      "distribution": "multi_hop",
+      "question": "Nhân viên đi công tác nước ngoài 4 ngày tại thành phố lớn, ở khách sạn 200 USD/đêm (3 đêm). Công ty thanh toán bao nhiêu tiền khách sạn?",
+      "avg_score": 0.6999,
+      "worst_metric": "faithfulness"
+    }
+  ]
+}

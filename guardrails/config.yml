@@ -1,7 +1,24 @@
 models:
+  # self_check_input/output yêu cầu model trả về ĐÚNG một từ Yes/No.
+  # Đã thử gemma-4-31b-it: nó xuất ra cả chuỗi suy luận dài rồi mới kết luận
+  # "Decision: No", NeMo parse không ra → mặc định chặn → false positive 100%
+  # (chặn sạch cả câu hỏi HR hợp lệ) và P95 latency 29s. gpt-4o-mini bám đúng
+  # định dạng một từ và trả lời ~1s.
   - type: main
     engine: openai
     model: gpt-4o-mini
+    parameters:
+      temperature: 0.0
+      max_tokens: 5
+
+  # Embedding cho canonical-form matching của Colang — chạy local (FastEmbed),
+  # không gọi API nên không tốn quota và không cộng vào latency mạng.
+  # Mặc định của NeMo là all-MiniLM-L6-v2 (chỉ tiếng Anh) → khớp kém với utterance
+  # tiếng Việt trong rails.co. Bản multilingual-MiniLM chỉ 0.22GB, đủ nhẹ cho máy
+  # lab (e5-large tốt hơn nhưng nặng 2.2GB, sẽ tranh RAM với bge-m3/reranker).
+  - type: embeddings
+    engine: FastEmbed
+    model: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 
 instructions:
   - type: general
@@ -14,11 +31,21 @@ instructions:
 rails:
   input:
     flows:
-      - check jailbreak
-      - check off topic
-      - check pii request
+      # self check input: LLM đọc hiểu ý định (prompt trong prompts.yml) — bắt được
+      # cả prompt injection nguỵ trang sau một câu hỏi HR hợp lệ.
+      - self check input
+      # Các dialog flow trong rails.co (check jailbreak / prompt injection /
+      # off topic / pii request) KHÔNG khai báo ở đây: `user ask X` là dialog rail,
+      # khi chạy như input rail nó stop mà không phát ra bot message, và khớp nhầm
+      # gần như mọi input. Chúng vẫn hoạt động ở tầng dialog cho câu đã qua input rail.
   output:
     flows:
-      - check sensitive output
+      - self check output
+
+  dialog:
+    # Gộp intent-generation + next-step + message-generation vào 1 LLM call thay vì 3
+    # — free tier Gemini chỉ 15 request/phút.
+    single_call:
+      enabled: True
 
 # Colang dialogue flows are defined in rails.co
